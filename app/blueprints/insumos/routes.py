@@ -26,6 +26,7 @@ def novo():
             preco_compra_embalagem=float(request.form.get("preco_compra_embalagem", 0) or 0),
             estoque_atual=float(request.form.get("estoque_atual", 0) or 0),
             estoque_minimo=float(request.form.get("estoque_minimo", 0) or 0),
+            minimo_em_embalagem=request.form.get("minimo_em_embalagem") == "true",
         )
         db.session.add(i)
         db.session.commit()
@@ -47,6 +48,7 @@ def editar(insumo_id: int):
         i.peso_por_embalagem = float(request.form.get("peso_por_embalagem", i.peso_por_embalagem) or 1)
         i.preco_compra_embalagem = float(request.form.get("preco_compra_embalagem", i.preco_compra_embalagem) or 0)
         i.estoque_minimo = float(request.form.get("estoque_minimo", i.estoque_minimo) or 0)
+        i.minimo_em_embalagem = request.form.get("minimo_em_embalagem") == "true"
         db.session.commit()
         flash(f"Insumo '{i.nome}' atualizado.", "success")
         return redirect(url_for("insumos.listar"))

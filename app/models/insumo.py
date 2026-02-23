@@ -14,6 +14,7 @@ class Insumo(db.Model):
     preco_compra_embalagem = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     estoque_atual = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     estoque_minimo = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    minimo_em_embalagem = db.Column(db.Boolean, nullable=False, default=True)
     ativo = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime(timezone=True),
@@ -47,10 +48,10 @@ class Insumo(db.Model):
     def estoque_minimo_valor_base(self) -> Decimal:
         """
         Calculates minimum stock requirement in base unit.
-        - For 'g' and 'ml', the minimum is specified in 'packs' (e.g. 2 means 2 packs).
-        - For 'un', the minimum is specified in 'units' (e.g. 12 means 12 eggs).
+        - If minimo_em_embalagem is True, multiplies estoque_minimo by weight per pack.
+        - Otherwise, treats estoque_minimo as a value in base units.
         """
-        if self.unidade in ['g', 'ml']:
+        if self.minimo_em_embalagem:
             return Decimal(str(self.estoque_minimo)) * Decimal(str(self.peso_por_embalagem))
         return Decimal(str(self.estoque_minimo))
 

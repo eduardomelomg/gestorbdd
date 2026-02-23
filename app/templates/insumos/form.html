@@ -33,9 +33,16 @@
         <input type="number" step="0.01" name="estoque_atual" id="total_qty" class="form-control" value="{{ insumo.estoque_atual | format_form if insumo else 1000 }}">
         <div class="form-text text-primary">Calculado: <span id="calc_text"></span></div>
       </div>
-      <div class="mb-3"><label class="form-label">Estoque Mínimo</label>
-        <input type="number" step="0.01" name="estoque_minimo" class="form-control" value="{{ insumo.estoque_minimo | format_form if insumo else 0 }}">
-        <div class="form-text">Mínimo em <strong>{{ 'unidades (ovos, etc)' if insumo and insumo.unidade == 'un' else 'embalagens/pacotes' }}</strong></div>
+      <div class="mb-3">
+        <label class="form-label">Estoque Mínimo</label>
+        <div class="input-group input-group-sm mb-1">
+          <input type="number" step="0.01" name="estoque_minimo" class="form-control" value="{{ insumo.estoque_minimo | format_form if insumo else 0 }}">
+          <select name="minimo_em_embalagem" class="form-select" style="max-width: 150px;">
+            <option value="true" {{ 'selected' if not insumo or insumo.minimo_em_embalagem }}>Embalagens</option>
+            <option value="false" {{ 'selected' if insumo and not insumo.minimo_em_embalagem }}>Unid. Base (g/ml/un)</option>
+          </select>
+        </div>
+        <div class="form-text">Escolha se o mínimo é em pacotes fechados ou na unidade de uso.</div>
       </div>
       
       <script>
