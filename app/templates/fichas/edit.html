@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Ficha Técnica — {{ produto.nome }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="{{ url_for('fichas.listar') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h4 class="fw-bold mb-0">Ficha Técnica — {{ produto.nome }}</h4>
+</div>
+<div class="row g-3">
+  <!-- Header edit -->
+  <div class="col-md-5">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-bold">Parâmetros</div>
+      <div class="card-body">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="save_header">
+          <div class="mb-2"><label class="form-label small">Rendimento (unidades)</label>
+            <input type="number" step="0.01" name="rendimento_unidades" class="form-control form-control-sm" value="{{ ficha.rendimento_unidades }}" required></div>
+          <div class="mb-2"><label class="form-label small">Mão de Obra Total (R$)</label>
+            <input type="number" step="0.01" name="mao_de_obra_total" class="form-control form-control-sm" value="{{ ficha.mao_de_obra_total }}"></div>
+          <div class="mb-2"><label class="form-label small">Perdas (%)</label>
+            <input type="number" step="0.01" name="perdas_percentual" class="form-control form-control-sm" value="{{ ficha.perdas_percentual }}"></div>
+          <div class="mb-3"><label class="form-label small">Margem Desejada (%)</label>
+            <input type="number" step="0.01" name="margem_desejada_percentual" class="form-control form-control-sm" value="{{ ficha.margem_desejada_percentual }}"></div>
+          <button type="submit" class="btn btn-sm btn-warning w-100">Salvar Parâmetros</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    <div class="card shadow-sm border-success">
+      <div class="card-header fw-bold text-success">Resultado Calculado</div>
+      <div class="card-body small">
+        <table class="table table-sm mb-0">
+          <tr><td>Custo insumos</td><td class="text-end">{{ resumo.custo_total_insumos | brl }}</td></tr>
+          <tr><td>Custo total receita (c/ perdas)</td><td class="text-end">{{ resumo.custo_total_receita | brl }}</td></tr>
+          <tr class="fw-bold"><td>Custo unitário</td><td class="text-end">{{ resumo.custo_unitario | brl }}</td></tr>
+          <tr class="table-success"><td>Preço sugerido</td><td class="text-end">{{ resumo.preco_sugerido | brl }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold">Ingredientes / Embalagens</div>
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Insumo</th><th>Qtd/Receita</th><th>Custo Item</th><th>Tipo</th><th></th></tr></thead>
+        <tbody>
+        {% for item in ficha.itens %}
+        <tr>
+          <td>{{ item.insumo.nome }} <small class="text-muted">({{ item.insumo.unidade }})</small></td>
+          <td>{{ item.quantidade_por_receita }}</td>
+          <td>{{ item.custo_item | brl }}</td>
+          <td><span class="badge bg-secondary">{{ item.tipo_item }}</span></td>
+          <td>
+            <form method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="remove_item">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+              <button class="btn btn-sm btn-outline-danger py-0">✕</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">Nenhum item. Adicione abaixo.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <!-- Add item form -->
+      <div class="card-footer">
+        <form method="POST" class="row g-2 align-items-end">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="add_item">
+          <div class="col-md-4"><label class="form-label small">Insumo</label>
+            <select name="insumo_id" class="form-select form-select-sm" required>
+              {% for i in insumos %}<option value="{{ i.id }}">{{ i.nome }} ({{ i.unidade }})</option>{% endfor %}
+            </select></div>
+          <div class="col-md-3"><label class="form-label small">Qtd por Receita</label>
+            <input type="number" step="0.0001" name="quantidade_por_receita" class="form-control form-control-sm" required></div>
+          <div class="col-md-3"><label class="form-label small">Tipo</label>
+            <select name="tipo_item" class="form-select form-select-sm">
+              <option>Insumo</option><option>Embalagem</option>
+            </select></div>
+          <div class="col-md-2"><button type="submit" class="btn btn-sm btn-success w-100">+ Add</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

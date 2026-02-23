@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Gestor Brownie do Dudu{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-2 d-none d-md-block sidebar py-3 px-2">
+      <div class="brand mb-4 d-flex flex-column align-items-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Brownie do Dudu" class="img-fluid mb-2 rounded-circle" style="max-width: 80px; border: 3px solid var(--brand-orange);">
+        <div class="text-center">Brownie do Dudu</div>
+      </div>
+      <ul class="nav flex-column gap-1">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('main') %}active{% endif %}" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('main.agenda') %}active{% endif %}" href="{{ url_for('main.agenda') }}"><i class="bi bi-calendar3"></i> Agenda</a></li>
+        <hr class="text-secondary">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('pedidos') %}active{% endif %}" href="{{ url_for('pedidos.listar') }}"><i class="bi bi-bag-check"></i> Pedidos</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('clientes') %}active{% endif %}" href="{{ url_for('clientes.listar') }}"><i class="bi bi-people"></i> Clientes</a></li>
+        <hr class="text-secondary">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('produtos') %}active{% endif %}" href="{{ url_for('produtos.listar') }}"><i class="bi bi-box-seam"></i> Produtos</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('fichas') %}active{% endif %}" href="{{ url_for('fichas.listar') }}"><i class="bi bi-calculator"></i> Fichas Técnicas</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('insumos') %}active{% endif %}" href="{{ url_for('insumos.listar') }}"><i class="bi bi-archive"></i> Insumos</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('compras') %}active{% endif %}" href="{{ url_for('compras.listar') }}"><i class="bi bi-cart-plus"></i> Compras</a></li>
+        <hr class="text-secondary">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('financeiro') %}active{% endif %}" href="{{ url_for('financeiro.index') }}"><i class="bi bi-currency-dollar"></i> Financeiro</a></li>
+      </ul>
+      <hr class="text-secondary">
+      <div class="ps-2 mb-3">
+        <a href="{{ url_for('auth.perfil') }}" class="d-flex align-items-center text-decoration-none" style="color: #FFF;">
+          {% if current_user.foto_perfil %}
+            <img src="{{ url_for('static', filename=current_user.foto_perfil) }}" alt="" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--brand-orange);">
+          {% else %}
+            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; border: 2px solid var(--brand-orange);">
+              <span class="fw-bold" style="font-size: 0.8rem;">{{ current_user.nome[:1] | upper }}</span>
+            </div>
+          {% endif %}
+          <div class="overflow-hidden">
+            <div class="fw-bold text-truncate" style="font-size: 0.9rem;">{{ current_user.username or current_user.nome }}</div>
+            <span class="badge bg-secondary" style="font-size: 0.65rem;">{{ current_user.role }}</span>
+          </div>
+        </a>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger py-1"><i class="bi bi-box-arrow-left"></i> Sair</a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="col-md-10 ms-sm-auto px-4 py-3">
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

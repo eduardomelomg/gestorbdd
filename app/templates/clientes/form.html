@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{% if cliente %}Editar Cliente{% else %}Novo Cliente{% endif %}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="{{ url_for('clientes.listar') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h4 class="fw-bold mb-0">{% if cliente %}Editar: {{ cliente.nome }}{% else %}Novo Cliente{% endif %}</h4>
+</div>
+<div class="card shadow-sm" style="max-width:600px">
+  <div class="card-body">
+    <form method="POST" onsubmit="return confirm('Deseja salvar as alterações deste cliente?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3"><label class="form-label">Nome *</label>
+        <input type="text" name="nome" class="form-control" required value="{{ cliente.nome if cliente else '' }}"></div>
+      <div class="row g-3 mb-3">
+        <div class="col"><label class="form-label">Tipo</label>
+          <select name="tipo" class="form-select">
+            {% for t in ["Pessoa","Empresa"] %}<option {{ "selected" if cliente and cliente.tipo == t }}>{{ t }}</option>{% endfor %}
+          </select></div>
+        <div class="col"><label class="form-label">Canal</label>
+          <select name="canal_preferencial" class="form-select">
+            {% for t in ["B2C","B2B"] %}<option {{ "selected" if cliente and cliente.canal_preferencial == t }}>{{ t }}</option>{% endfor %}
+          </select></div>
+        <div class="col"><label class="form-label">Tabela Preço</label>
+          <select name="tabela_preco" class="form-select">
+            {% for t in ["Varejo","Atacado"] %}<option {{ "selected" if cliente and cliente.tabela_preco == t }}>{{ t }}</option>{% endfor %}
+          </select></div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col"><label class="form-label">Telefone</label>
+          <input type="text" name="telefone" class="form-control" value="{{ cliente.telefone if cliente else '' }}"></div>
+        <div class="col"><label class="form-label">Documento (CPF/CNPJ)</label>
+          <input type="text" name="documento" class="form-control" value="{{ cliente.documento if cliente else '' }}"></div>
+        <div class="col"><label class="form-label">Prazo Pgto (dias)</label>
+          <input type="number" name="prazo_pagamento_dias" class="form-control" value="{{ cliente.prazo_pagamento_dias if cliente else 0 }}"></div>
+      </div>
+      <div class="mb-3"><label class="form-label">Endereço</label>
+        <textarea name="endereco" class="form-control" rows="2">{{ cliente.endereco if cliente else '' }}</textarea></div>
+      {% if cliente %}
+      <div class="form-check mb-3">
+        <input type="checkbox" name="ativo" id="ativo" class="form-check-input" {{ "checked" if cliente.ativo }}>
+        <label for="ativo" class="form-check-label">Ativo</label>
+      </div>
+      {% endif %}
+      <button type="submit" class="btn btn-warning">Salvar</button>
+      <a href="{{ url_for('clientes.listar') }}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0"><i class="bi bi-bag-check"></i> Pedidos</h4>
+  <a href="{{ url_for('pedidos.novo') }}" class="btn btn-warning"><i class="bi bi-plus-lg"></i> Novo Pedido</a>
+</div>
+<!-- Status filter tabs -->
+<ul class="nav nav-pills mb-3">
+  {% for s in ["", "Agendado", "Em produção", "Pronto", "Entregue", "Cancelado"] %}
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == s %}active{% endif %}" href="{{ url_for('pedidos.listar', status=s) }}">
+      {{ s if s else "Todos" }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-dark">
+        <tr><th>Nº</th><th>Cliente</th><th>Agendado</th><th>Status</th><th>Pagamento</th><th>Total</th><th>Recebido</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for p in pedidos %}
+      <tr>
+        <td><strong>{{ p.numero_pedido }}</strong></td>
+        <td>{{ p.cliente.nome }}</td>
+        <td class="text-nowrap">{{ p.data_hora_agendada.strftime('%d/%m/%Y %H:%M') if p.data_hora_agendada else '—' }}</td>
+        <td>{{ p.status_pedido | status_badge | safe }}</td>
+        <td>{{ p.status_pagamento | status_badge | safe }}</td>
+        <td>{{ p.total_pedido | brl }}</td>
+        <td>{{ p.soma_recebida | brl }}</td>
+        <td><a href="{{ url_for('pedidos.detalhe', pedido_id=p.id) }}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="text-center text-muted py-4">Nenhum pedido.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

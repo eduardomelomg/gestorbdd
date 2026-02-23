@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}{{ pedido.numero_pedido }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center mb-3 gap-2">
+  <a href="{{ url_for('pedidos.listar') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h4 class="fw-bold mb-0">Pedido {{ pedido.numero_pedido }}</h4>
+  {{ pedido.status_pedido | status_badge | safe }}
+  {{ pedido.status_pagamento | status_badge | safe }}
+</div>
+
+<div class="row g-3">
+  <!-- Info + Status -->
+  <div class="col-md-4">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-bold">Informações</div>
+      <div class="card-body small">
+        <p class="mb-1"><strong>Cliente:</strong> {{ pedido.cliente.nome }}</p>
+        <p class="mb-1"><strong>Canal:</strong> {{ pedido.canal }}</p>
+        <p class="mb-1"><strong>Entrega:</strong> {{ pedido.tipo_entrega }}</p>
+        {% if pedido.endereco_entrega %}<p class="mb-1"><strong>Endereço:</strong> {{ pedido.endereco_entrega }}</p>{% endif %}
+        <p class="mb-1"><strong>Agendado:</strong> {{ pedido.data_hora_agendada.strftime('%d/%m/%Y %H:%M') if pedido.data_hora_agendada else '—' }}</p>
+        {% if pedido.observacoes %}<p class="mb-1"><strong>Obs:</strong> {{ pedido.observacoes }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- Mudar Status -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-bold">Mudar Status do Pedido</div>
+      <div class="card-body">
+        {% for s in ["Rascunho","Agendado","Em produção","Pronto","Entregue","Cancelado"] %}
+        <form method="POST" action="{{ url_for('pedidos.mudar_status', pedido_id=pedido.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="status" value="{{ s }}">
+          <button class="btn btn-sm mb-1 {% if pedido.status_pedido == s %}btn-dark{% else %}btn-outline-dark{% endif %}"
+                  {% if pedido.status_pedido == s %}disabled{% endif %}>{{ s }}</button>
+        </form>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Financeiro resumo -->
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold">Financeiro</div>
+      <div class="card-body small">
+        <table class="table table-sm mb-0">
+          <tr><td>Subtotal</td><td class="text-end">{{ pedido.subtotal | brl }}</td></tr>
+          <tr><td>Desconto</td><td class="text-end text-danger">- {{ pedido.desconto | brl }}</td></tr>
+          <tr><td>Taxa Entrega</td><td class="text-end">{{ pedido.taxa_entrega | brl }}</td></tr>
+          <tr class="fw-bold"><td>Total</td><td class="text-end">{{ pedido.total_pedido | brl }}</td></tr>
+          <tr><td>Custo Estimado</td><td class="text-end text-danger">{{ pedido.custo_estimado | brl }}</td></tr>
+          <tr><td>Lucro Estimado</td><td class="text-end text-{% if pedido.lucro_estimado >= 0 %}success{% else %}danger{% endif %}">{{ pedido.lucro_estimado | brl }}</td></tr>
+          <tr class="table-warning"><td>Soma Recebida</td><td class="text-end">{{ pedido.soma_recebida | brl }}</td></tr>
+          <tr><td>A receber</td><td class="text-end">{{ (pedido.total_pedido - pedido.soma_recebida) | brl }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items + Payments -->
+  <div class="col-md-8">
+    <!-- Items -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-bold">Itens do Pedido</div>
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Total</th><th>Custo</th></tr></thead>
+        <tbody>
+        {% for item in pedido.itens %}
+        <tr>
+          <td>{{ item.produto.nome }}</td>
+          <td>{{ item.quantidade }}</td>
+          <td>{{ item.preco_unitario | brl }}</td>
+          <td>{{ item.total_item | brl }}</td>
+          <td class="text-muted">{{ item.custo_item | brl }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center">Sem itens.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Payments -->
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+        Pagamentos
+        <button class="btn btn-sm btn-success" data-bs-toggle="collapse" data-bs-target="#formPagamento">
+          <i class="bi bi-plus-lg"></i> Registrar Recebimento
+        </button>
+      </div>
+      <div class="collapse p-3" id="formPagamento">
+        <form method="POST" action="{{ url_for('pedidos.adicionar_pagamento', pedido_id=pedido.id) }}" class="row g-2">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="col-md-3">
+            <label class="form-label small">Data</label>
+            <input type="date" name="data_recebimento" class="form-control form-control-sm" required value="{{ today }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Forma</label>
+            <select name="forma_pagamento" class="form-select form-select-sm">
+              {% for f in ["PIX","Dinheiro","Cartão","Transferência"] %}
+              <option>{{ f }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small">Valor (R$)</label>
+            <input type="number" step="0.01" name="valor_recebido" class="form-control form-control-sm" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small">Taxa Cartão</label>
+            <input type="number" step="0.01" name="taxa_cartao" class="form-control form-control-sm" value="0">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success btn-sm w-100">Salvar</button>
+          </div>
+        </form>
+      </div>
+      <table class="table table-sm mb-0">
+        <thead class="table-light"><tr><th>Data</th><th>Forma</th><th>Valor</th><th>Taxa Cartão</th></tr></thead>
+        <tbody>
+        {% for pag in pedido.pagamentos %}
+        <tr>
+          <td>{{ pag.data_recebimento.strftime('%d/%m/%Y') }}</td>
+          <td>{{ pag.forma_pagamento }}</td>
+          <td>{{ pag.valor_recebido | brl }}</td>
+          <td>{{ pag.taxa_cartao | brl }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted text-center">Nenhum pagamento.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% if current_user.is_admin %}
+<div class="mt-4">
+  <form method="POST" action="{{ url_for('pedidos.deletar', pedido_id=pedido.id) }}"
+        onsubmit="return confirm('Confirma exclusão?')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Excluir Pedido</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dateInputs = document.querySelectorAll('input[name="data_recebimento"]');
+    const today = new Date().toISOString().split('T')[0];
+    dateInputs.forEach(el => { if(!el.value) el.value = today; });
+  });
+</script>
+{% endblock %}
