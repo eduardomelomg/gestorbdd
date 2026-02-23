@@ -37,3 +37,15 @@ def register_filters(app: Flask) -> None:
         }
         cls = classes.get(status, "secondary")
         return f'<span class="badge bg-{cls}">{status}</span>'
+    @app.template_filter("mes_extenso")
+    def mes_extenso(mes_num) -> str:
+        """Converts month number (1-12) to Portuguese month name."""
+        try:
+            meses = {
+                1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
+                5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
+                9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
+            }
+            return meses.get(int(mes_num), "")
+        except (TypeError, ValueError):
+            return ""

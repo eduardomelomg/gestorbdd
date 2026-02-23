@@ -11,16 +11,18 @@ from app.services.relatorio_service import (
 @bp.route("/")
 @login_required
 def dashboard():
-    now = datetime.now(timezone.utc)
-    kpis = dashboard_mes(now.year, now.month)
-    proximas = pedidos_proximas_entregas(10)
-    alertas = insumos_estoque_baixo()
+    meses_pt = {
+        1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
+        5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
+        9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
+    }
+    mes_nome = meses_pt[now.month]
     return render_template(
         "main/dashboard.html",
         kpis=kpis,
         proximas=proximas,
         alertas=alertas,
-        mes_atual=now.strftime("%B/%Y"),
+        mes_atual=f"{mes_nome} - {now.year}",
     )
 
 

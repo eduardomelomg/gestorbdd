@@ -19,7 +19,7 @@
         <div class="text-center">Brownie do Dudu</div>
       </div>
       <ul class="nav flex-column gap-1">
-        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('main') %}active{% endif %}" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('main') %}active{% endif %}" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2"></i> Painel</a></li>
         <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('main.agenda') %}active{% endif %}" href="{{ url_for('main.agenda') }}"><i class="bi bi-calendar3"></i> Agenda</a></li>
         <hr class="text-secondary">
         <li class="nav-item"><a class="nav-link {% if request.endpoint and request.endpoint.startswith('pedidos') %}active{% endif %}" href="{{ url_for('pedidos.listar') }}"><i class="bi bi-bag-check"></i> Pedidos</a></li>
