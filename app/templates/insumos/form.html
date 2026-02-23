@@ -17,24 +17,24 @@
             {% for u in ["g","kg","ml","l","un"] %}<option {{ "selected" if insumo and insumo.unidade == u }}>{{ u }}</option>{% endfor %}
           </select></div>
         <div class="col-md-3"><label class="form-label">Qtd Embalagem</label>
-          <input type="number" step="1" name="quantidade_embalagem_compra" id="qty_packs" class="form-control" value="{{ insumo.quantidade_embalagem_compra if insumo else 1 }}" oninput="calcTotal()">
+          <input type="number" step="1" name="quantidade_embalagem_compra" id="qty_packs" class="form-control" value="{{ insumo.quantidade_embalagem_compra | format_form if insumo else 1 }}" oninput="calcTotal()">
           <div class="form-text">Ex: 2 potes</div>
         </div>
         <div class="col-md-3"><label class="form-label">Conteúdo/Emb.</label>
-          <input type="number" step="0.01" name="peso_por_embalagem" id="weight_pack" class="form-control" value="{{ insumo.peso_por_embalagem if insumo else 1000 }}" oninput="calcTotal()">
+          <input type="number" step="0.01" name="peso_por_embalagem" id="weight_pack" class="form-control" value="{{ insumo.peso_por_embalagem | format_form if insumo else 1000 }}" oninput="calcTotal()">
           <div class="form-text">Ex: 500</div>
         </div>
         <div class="col-md-3"><label class="form-label">Preço Unit. (R$)</label>
-          <input type="number" step="0.01" name="preco_compra_embalagem" class="form-control" value="{{ insumo.preco_compra_embalagem if insumo else 0 }}">
+          <input type="number" step="0.01" name="preco_compra_embalagem" class="form-control" value="{{ insumo.preco_compra_embalagem | format_form if insumo else 0 }}">
           <div class="form-text">Por pote/unid.</div>
         </div>
       </div>
       <div class="mb-3"><label class="form-label">Estoque Inicial (<span id="unit_label">{{ insumo.unidade if insumo else 'g' }}</span>)</label>
-        <input type="number" step="0.01" name="estoque_atual" id="total_qty" class="form-control" value="{{ insumo.estoque_atual if insumo else 1000 }}">
+        <input type="number" step="0.01" name="estoque_atual" id="total_qty" class="form-control" value="{{ insumo.estoque_atual | format_form if insumo else 1000 }}">
         <div class="form-text text-primary">Calculado: <span id="calc_text"></span></div>
       </div>
       <div class="mb-3"><label class="form-label">Estoque Mínimo</label>
-        <input type="number" step="0.01" name="estoque_minimo" class="form-control" value="{{ insumo.estoque_minimo if insumo else 0 }}"></div>
+        <input type="number" step="0.01" name="estoque_minimo" class="form-control" value="{{ insumo.estoque_minimo | format_form if insumo else 0 }}"></div>
       
       <script>
         function calcTotal() {
@@ -48,7 +48,8 @@
           document.getElementById('unit_label').innerText = this.value;
         };
         // Initial calc
-        if (!{{ 'true' if insumo else 'false' }}) {
+        const isEditing = {{ 'true' if insumo else 'false' }};
+        if (!isEditing) {
           calcTotal();
         }
       </script>

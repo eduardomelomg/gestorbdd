@@ -49,3 +49,12 @@ def register_filters(app: Flask) -> None:
             return meses.get(int(mes_num), "")
         except (TypeError, ValueError):
             return ""
+
+    @app.template_filter("format_form")
+    def format_form(value) -> str:
+        """Format a number for HTML5 number input value attribute (always uses dot)."""
+        try:
+            v = float(value)
+            return f"{v:.2f}"
+        except (TypeError, ValueError):
+            return "0.00"

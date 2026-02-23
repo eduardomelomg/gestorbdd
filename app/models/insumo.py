@@ -9,11 +9,11 @@ class Insumo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(150), nullable=False)
     unidade = db.Column(db.String(10), nullable=False, default="g")          # g / kg / ml / l / un
-    quantidade_embalagem_compra = db.Column(db.Numeric(10, 4), nullable=False, default=1)
-    peso_por_embalagem = db.Column(db.Numeric(10, 4), nullable=False, default=1)
-    preco_compra_embalagem = db.Column(db.Numeric(10, 2), nullable=False, default=0)
-    estoque_atual = db.Column(db.Numeric(12, 4), nullable=False, default=0)
-    estoque_minimo = db.Column(db.Numeric(12, 4), nullable=False, default=0)
+    quantidade_embalagem_compra = db.Column(db.Numeric(12, 2), nullable=False, default=1)
+    peso_por_embalagem = db.Column(db.Numeric(12, 2), nullable=False, default=1)
+    preco_compra_embalagem = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    estoque_atual = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    estoque_minimo = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     ativo = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime(timezone=True),
