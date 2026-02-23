@@ -12,26 +12,46 @@
       <div class="mb-3"><label class="form-label">Nome *</label>
         <input type="text" name="nome" class="form-control" required value="{{ insumo.nome if insumo else '' }}"></div>
       <div class="row g-3 mb-3">
-        <div class="col"><label class="form-label">Unidade</label>
-          <select name="unidade" class="form-select">
+        <div class="col-md-3"><label class="form-label">Unidade</label>
+          <select name="unidade" id="unidade" class="form-select">
             {% for u in ["g","kg","ml","l","un"] %}<option {{ "selected" if insumo and insumo.unidade == u }}>{{ u }}</option>{% endfor %}
           </select></div>
-        <div class="col"><label class="form-label">Qtd Embalagem</label>
-          <input type="number" step="0.0001" name="quantidade_embalagem_compra" class="form-control" value="{{ insumo.quantidade_embalagem_compra if insumo else 1 }}"></div>
-        <div class="col"><label class="form-label">Preço Embalagem (R$)</label>
-          <input type="number" step="0.01" name="preco_compra_embalagem" class="form-control" value="{{ insumo.preco_compra_embalagem if insumo else 0 }}"></div>
+        <div class="col-md-3"><label class="form-label">Qtd Embalagem</label>
+          <input type="number" step="1" name="quantidade_embalagem_compra" id="qty_packs" class="form-control" value="{{ insumo.quantidade_embalagem_compra if insumo else 1 }}" oninput="calcTotal()">
+          <div class="form-text">Ex: 2 potes</div>
+        </div>
+        <div class="col-md-3"><label class="form-label">Conteúdo/Emb.</label>
+          <input type="number" step="0.0001" name="peso_por_embalagem" id="weight_pack" class="form-control" value="{{ insumo.peso_por_embalagem if insumo else 1000 }}" oninput="calcTotal()">
+          <div class="form-text">Ex: 500</div>
+        </div>
+        <div class="col-md-3"><label class="form-label">Preço Unit. (R$)</label>
+          <input type="number" step="0.01" name="preco_compra_embalagem" class="form-control" value="{{ insumo.preco_compra_embalagem if insumo else 0 }}">
+          <div class="form-text">Por pote/unid.</div>
+        </div>
       </div>
-      {% if not insumo %}
-      <div class="mb-3"><label class="form-label">Estoque Inicial</label>
-        <input type="number" step="0.0001" name="estoque_atual" class="form-control" value="0"></div>
-      {% endif %}
+      <div class="mb-3"><label class="form-label">Estoque Inicial (<span id="unit_label">{{ insumo.unidade if insumo else 'g' }}</span>)</label>
+        <input type="number" step="0.0001" name="estoque_atual" id="total_qty" class="form-control" value="{{ insumo.estoque_atual if insumo else 1000 }}">
+        <div class="form-text text-primary">Calculado: <span id="calc_text"></span></div>
+      </div>
       <div class="mb-3"><label class="form-label">Estoque Mínimo</label>
         <input type="number" step="0.0001" name="estoque_minimo" class="form-control" value="{{ insumo.estoque_minimo if insumo else 0 }}"></div>
-      {% if insumo %}
-      <div class="form-check mb-3">
-        <input type="checkbox" name="ativo" id="ativo" class="form-check-input" {{ "checked" if insumo.ativo }}>
-        <label for="ativo" class="form-check-label">Ativo</label></div>
-      {% endif %}
+      
+      <script>
+        function calcTotal() {
+          const qty = parseFloat(document.getElementById('qty_packs').value) || 0;
+          const weight = parseFloat(document.getElementById('weight_pack').value) || 0;
+          const total = qty * weight;
+          document.getElementById('total_qty').value = total;
+          document.getElementById('calc_text').innerText = qty + ' x ' + weight + ' = ' + total;
+        }
+        document.getElementById('unidade').onchange = function() {
+          document.getElementById('unit_label').innerText = this.value;
+        };
+        // Initial calc
+        if (!{{ 'true' if insumo else 'false' }}) {
+          calcTotal();
+        }
+      </script>
       {% if insumo %}
       <div class="alert alert-info py-2 small">
         Custo unitário calculado: <strong>{{ insumo.custo_unitario | brl }}/{{ insumo.unidade }}</strong>

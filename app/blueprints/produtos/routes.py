@@ -59,7 +59,8 @@ def editar(produto_id: int):
 def deletar(produto_id: int):
     p = db.session.get(Produto, produto_id)
     if p:
-        p.ativo = False
+        nome = p.nome
+        db.session.delete(p)
         db.session.commit()
-        flash(f"Produto '{p.nome}' desativado.", "success")
+        flash(f"Produto '{nome}' removido permanentemente.", "success")
     return redirect(url_for("produtos.listar"))

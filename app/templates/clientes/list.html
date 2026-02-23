@@ -8,27 +8,26 @@
 <div class="card shadow-sm">
   <div class="card-body p-0">
     <table class="table table-hover align-middle mb-0">
-      <thead class="table-dark"><tr><th>Nome</th><th>Tipo</th><th>Canal</th><th>Tabela</th><th>Telefone</th><th>Status</th><th></th></tr></thead>
+      <thead class="table-dark"><tr><th>Nome</th><th>Tipo / Canal</th><th>Telefone</th><th>Documento</th><th>Pgto</th><th></th></tr></thead>
       <tbody>
       {% for c in clientes %}
       <tr>
         <td>{{ c.nome }}</td>
-        <td>{{ c.tipo }}</td>
-        <td><span class="badge bg-info text-dark">{{ c.canal_preferencial }}</span></td>
-        <td>{{ c.tabela_preco }}</td>
-        <td>{{ c.telefone or '—' }}</td>
-        <td>{% if c.ativo %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-secondary">Inativo</span>{% endif %}</td>
-        <td class="d-flex gap-1">
-          <a href="{{ url_for('clientes.editar', cliente_id=c.id) }}" class="btn btn-sm btn-outline-primary" onclick="return confirm('Deseja editar este cliente?')">Editar</a>
+        <td>{{ c.tipo }} / {{ c.canal_preferencial }}</td>
+        <td>{{ c.telefone }}</td>
+        <td>{{ c.documento }}</td>
+        <td>{{ c.prazo_pagamento_dias }}d / {{ c.tabela_preco }}</td>
+        <td class="d-flex gap-1 justify-content-end">
+          <a href="{{ url_for('clientes.editar', cliente_id=c.id) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
           {% if current_user.is_admin %}
-          <form method="POST" action="{{ url_for('clientes.deletar', cliente_id=c.id) }}" onsubmit="return confirm('Deseja realmente remover este cliente?')">
+          <form method="POST" action="{{ url_for('clientes.deletar', cliente_id=c.id) }}" onsubmit="return confirm('Deseja realmente REMOVER PERMANENTEMENTE este cliente?')">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover"><i class="bi bi-trash"></i> Remover</button>
+            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover"><i class="bi bi-trash"></i></button>
           </form>
           {% endif %}
         </td>
       </tr>
-      {% else %}<tr><td colspan="7" class="text-center text-muted py-4">Nenhum cliente.</td></tr>
+      {% else %}<tr><td colspan="6" class="text-center text-muted py-4">Nenhum cliente.</td></tr>
       {% endfor %}
       </tbody>
     </table>

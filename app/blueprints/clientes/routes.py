@@ -10,9 +10,7 @@ from app.blueprints.auth.decorators import admin_required
 @bp.route("/")
 @login_required
 def listar():
-    clientes = db.session.execute(
-        select(Cliente).order_by(Cliente.nome)
-    ).scalars().all()
+    clientes = db.session.execute(select(Cliente).order_by(Cliente.nome)).scalars().all()
     return render_template("clientes/list.html", clientes=clientes)
 
 
@@ -65,7 +63,8 @@ def editar(cliente_id: int):
 def deletar(cliente_id: int):
     c = db.session.get(Cliente, cliente_id)
     if c:
-        c.ativo = False
+        nome = c.nome
+        db.session.delete(c)
         db.session.commit()
-        flash(f"Cliente '{c.nome}' desativado.", "success")
+        flash(f"Cliente '{nome}' removido permanentemente.", "success")
     return redirect(url_for("clientes.listar"))

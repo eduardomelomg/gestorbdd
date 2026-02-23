@@ -22,6 +22,7 @@ def novo():
             nome=request.form["nome"],
             unidade=request.form.get("unidade", "g"),
             quantidade_embalagem_compra=float(request.form.get("quantidade_embalagem_compra", 1) or 1),
+            peso_por_embalagem=float(request.form.get("peso_por_embalagem", 1) or 1),
             preco_compra_embalagem=float(request.form.get("preco_compra_embalagem", 0) or 0),
             estoque_atual=float(request.form.get("estoque_atual", 0) or 0),
             estoque_minimo=float(request.form.get("estoque_minimo", 0) or 0),
@@ -43,9 +44,9 @@ def editar(insumo_id: int):
         i.nome = request.form["nome"]
         i.unidade = request.form.get("unidade", i.unidade)
         i.quantidade_embalagem_compra = float(request.form.get("quantidade_embalagem_compra", i.quantidade_embalagem_compra) or 1)
+        i.peso_por_embalagem = float(request.form.get("peso_por_embalagem", i.peso_por_embalagem) or 1)
         i.preco_compra_embalagem = float(request.form.get("preco_compra_embalagem", i.preco_compra_embalagem) or 0)
         i.estoque_minimo = float(request.form.get("estoque_minimo", i.estoque_minimo) or 0)
-        i.ativo = "ativo" in request.form
         db.session.commit()
         flash(f"Insumo '{i.nome}' atualizado.", "success")
         return redirect(url_for("insumos.listar"))
@@ -58,7 +59,8 @@ def editar(insumo_id: int):
 def deletar(insumo_id: int):
     i = db.session.get(Insumo, insumo_id)
     if i:
-        i.ativo = False
+        nome = i.nome
+        db.session.delete(i)
         db.session.commit()
-        flash(f"Insumo '{i.nome}' desativado.", "success")
+        flash(f"Insumo '{nome}' removido permanentemente.", "success")
     return redirect(url_for("insumos.listar"))

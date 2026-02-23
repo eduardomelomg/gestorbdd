@@ -8,7 +8,7 @@
 <div class="card shadow-sm">
   <div class="card-body p-0">
     <table class="table table-hover align-middle mb-0">
-      <thead class="table-dark"><tr><th>Nome</th><th>Unidade</th><th>Custo Unit.</th><th>Estoque Atual</th><th>Mínimo</th><th>Status</th><th></th></tr></thead>
+      <thead class="table-dark"><tr><th>Nome</th><th>Unidade</th><th>Custo Unit.</th><th>Estoque Atual</th><th>Mínimo</th><th></th></tr></thead>
       <tbody>
       {% for i in insumos %}
       <tr class="{{ 'table-warning' if i.estoque_baixo else '' }}">
@@ -17,11 +17,10 @@
         <td>{{ i.custo_unitario | brl }}</td>
         <td>{{ i.estoque_atual }} {{ i.unidade }}</td>
         <td>{{ i.estoque_minimo }} {{ i.unidade }}</td>
-        <td>{% if i.ativo %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-secondary">Inativo</span>{% endif %}</td>
-        <td class="d-flex gap-1">
-          <a href="{{ url_for('insumos.editar', insumo_id=i.id) }}" class="btn btn-sm btn-outline-primary" onclick="return confirm('Deseja editar este insumo?')">Editar</a>
+        <td class="d-flex gap-1 justify-content-end">
+          <a href="{{ url_for('insumos.editar', insumo_id=i.id) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
           {% if current_user.is_admin %}
-          <form method="POST" action="{{ url_for('insumos.deletar', insumo_id=i.id) }}" onsubmit="return confirm('Deseja realmente remover este insumo?')">
+          <form method="POST" action="{{ url_for('insumos.deletar', insumo_id=i.id) }}" onsubmit="return confirm('Deseja realmente REMOVER PERMANENTEMENTE este insumo?')">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover"><i class="bi bi-trash"></i></button>
           </form>
