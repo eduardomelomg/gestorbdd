@@ -16,12 +16,20 @@ app = create_app()
 with app.app_context():
     print("Verificando estrutura do banco no Supabase...")
     try:
-        # Add column if not exists
-        db.session.execute(text("ALTER TABLE insumos ADD COLUMN IF NOT EXISTS peso_por_embalagem NUMERIC(10, 4) DEFAULT 1"))
+        # Update existing columns to 2 decimal places
+        alter_sql = """
+        ALTER TABLE insumos 
+          ALTER COLUMN quantidade_embalagem_compra TYPE NUMERIC(12, 2),
+          ALTER COLUMN peso_por_embalagem TYPE NUMERIC(12, 2),
+          ALTER COLUMN preco_compra_embalagem TYPE NUMERIC(12, 2),
+          ALTER COLUMN estoque_atual TYPE NUMERIC(12, 2),
+          ALTER COLUMN estoque_minimo TYPE NUMERIC(12, 2);
+        """
+        db.session.execute(text(alter_sql))
         db.session.commit()
-        print("Coluna 'peso_por_embalagem' adicionada/verificada com sucesso!")
+        print("Precisão de decimais atualizada para (12, 2) com sucesso!")
     except Exception as e:
-        print(f"Erro ao atualizar banco: {e}")
+        print(f"Erro ao atualizar precisão: {e}")
         db.session.rollback()
 
 print("Migração concluída! 🚀")

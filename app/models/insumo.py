@@ -37,8 +37,23 @@ class Insumo(db.Model):
         return Decimal("0")
 
     @property
+    def estoque_embalagens(self) -> Decimal:
+        """Calculates current stock in number of packs/units."""
+        if self.peso_por_embalagem and self.peso_por_embalagem > 0:
+            return Decimal(str(self.estoque_atual)) / Decimal(str(self.peso_por_embalagem))
+        return Decimal("0")
+
+    @property
+    def estoque_minimo_valor_base(self) -> Decimal:
+        """Calculates minimum stock requirement in base unit (g, ml, un)."""
+        if self.peso_por_embalagem:
+            return Decimal(str(self.estoque_minimo)) * Decimal(str(self.peso_por_embalagem))
+        return Decimal(str(self.estoque_minimo))
+
+    @property
     def estoque_baixo(self) -> bool:
-        return Decimal(str(self.estoque_atual)) <= Decimal(str(self.estoque_minimo))
+        """Checks if current stock (base unit) is below minimum (calculated in base unit)."""
+        return Decimal(str(self.estoque_atual)) <= self.estoque_minimo_valor_base
 
     def __repr__(self) -> str:
         return f"<Insumo {self.nome} [{self.unidade}]>"
