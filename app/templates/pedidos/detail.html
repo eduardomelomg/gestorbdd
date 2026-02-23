@@ -67,7 +67,7 @@
         {% for item in pedido.itens %}
         <tr>
           <td>{{ item.produto.nome }}</td>
-          <td>{{ item.quantidade }}</td>
+          <td>{{ item.quantidade | qty }}</td>
           <td>{{ item.preco_unitario | brl }}</td>
           <td>{{ item.total_item | brl }}</td>
           <td class="text-muted">{{ item.custo_item | brl }}</td>

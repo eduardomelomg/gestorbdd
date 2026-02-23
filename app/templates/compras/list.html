@@ -15,7 +15,7 @@
         <td>{{ c.data_compra.strftime('%d/%m/%Y') }}</td>
         <td>{{ c.fornecedor or '—' }}</td>
         <td>{{ c.insumo.nome }}</td>
-        <td>{{ c.quantidade_comprada }} {{ c.insumo.unidade }}</td>
+        <td>{{ c.quantidade_comprada | qty }} {{ c.insumo.unidade }}</td>
         <td>{{ c.custo_total | brl }}</td>
         <td>{% if current_user.is_admin %}
           <form method="POST" action="{{ url_for('compras.deletar', compra_id=c.id) }}" onsubmit="return confirm('Deseja realmente remover esta compra? O estoque será revertido.')">

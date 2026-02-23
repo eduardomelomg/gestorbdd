@@ -45,7 +45,19 @@ def editar(produto_id: int):
 
         elif action == "add_item":
             insumo_id = int(request.form.get("insumo_id"))
-            qtd = float(request.form.get("quantidade_por_receita", 0) or 0)
+            insumo = db.session.get(Insumo, insumo_id)
+            if not insumo:
+                abort(404)
+            
+            qtd_input = float(request.form.get("quantidade_por_receita", 0) or 0)
+            unidade_entrada = request.form.get("unidade_entrada", "base")
+            
+            # Convert to base unit if necessary
+            if unidade_entrada == "packs":
+                qtd = qtd_input * float(insumo.peso_por_embalagem)
+            else:
+                qtd = qtd_input
+                
             tipo = request.form.get("tipo_item", "Insumo")
             item = FichaTecnicaItem(
                 ficha_tecnica_id=ficha.id,
@@ -55,7 +67,7 @@ def editar(produto_id: int):
             )
             db.session.add(item)
             db.session.commit()
-            flash("Item adicionado.", "success")
+            flash(f"Item adicionado: {qtd_input} {'un' if unidade_entrada == 'packs' else insumo.unidade}.", "success")
 
         elif action == "remove_item":
             item_id = int(request.form.get("item_id"))

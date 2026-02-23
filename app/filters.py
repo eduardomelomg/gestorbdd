@@ -13,12 +13,16 @@ def register_filters(app: Flask) -> None:
 
     @app.template_filter("qty")
     def qty(value) -> str:
-        """Format a quantity with up to 2 decimal places, removing unnecessary zeros."""
+        """Format a quantity: removes .00, trailing zeros, and uses dot for thousands, comma for decimals."""
         try:
             v = float(value)
-            # Format with 2 decimals and replace separators
+            # If it's an integer, return without decimals
+            if v == int(v):
+                s = f"{int(v):,}".replace(",", ".")
+                return s
+            # Otherwise, format with up to 2 decimals, localized
             s = f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-            # Remove redundant ,00
+            # Remove trailing zero if exists (e.g. 1,50 -> 1,5)
             if s.endswith(",00"): s = s[:-3]
             elif "," in s and s.endswith("0"): s = s[:-1]
             return s
