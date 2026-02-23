@@ -115,7 +115,7 @@
         </form>
       </div>
       <table class="table table-sm mb-0">
-        <thead class="table-light"><tr><th>Data</th><th>Forma</th><th>Valor</th><th>Taxa Cartão</th></tr></thead>
+        <thead class="table-light"><tr><th>Data</th><th>Forma</th><th>Valor</th><th>Taxa Cartão</th><th class="text-end">Ações</th></tr></thead>
         <tbody>
         {% for pag in pedido.pagamentos %}
         <tr>
@@ -123,9 +123,22 @@
           <td>{{ pag.forma_pagamento }}</td>
           <td>{{ pag.valor_recebido | brl }}</td>
           <td>{{ pag.taxa_cartao | brl }}</td>
+          <td class="text-end">
+            <div class="d-flex justify-content-end gap-1">
+              <button class="btn btn-sm btn-outline-primary py-0 px-1" title="Editar"
+                      onclick="openEditModal({{ pag.id }}, '{{ pag.data_recebimento }}', '{{ pag.forma_pagamento }}', {{ pag.valor_recebido|float }}, {{ pag.taxa_cartao|float }})">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <form method="POST" action="{{ url_for('pedidos.deletar_pagamento', pagamento_id=pag.id) }}" 
+                    onsubmit="return confirm('Deseja realmente remover este pagamento?')" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1" title="Remover"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="text-muted text-center">Nenhum pagamento.</td></tr>
+        <tr><td colspan="5" class="text-muted text-center">Nenhum pagamento.</td></tr>
         {% endfor %}
         </tbody>
       </table>
@@ -142,9 +155,56 @@
   </form>
 </div>
 {% endif %}
+<!-- Modal Editar Pagamento -->
+<div class="modal fade" id="modalEditPagamento" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" id="formEditPagamento" class="modal-content">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Pagamento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Data</label>
+          <input type="date" name="data_recebimento" id="edit_data" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Forma</label>
+          <select name="forma_pagamento" id="edit_forma" class="form-select">
+            {% for f in ["PIX","Dinheiro","Cartão","Transferência"] %}<option>{{ f }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Valor (R$)</label>
+          <input type="number" step="0.01" name="valor_recebido" id="edit_valor" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Taxa Cartão</label>
+          <input type="number" step="0.01" name="taxa_cartao" id="edit_taxa" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 <script>
+  function openEditModal(id, data, forma, valor, taxa) {
+    const form = document.getElementById('formEditPagamento');
+    form.action = `/pedidos/pagamento/${id}/editar`;
+    document.getElementById('edit_data').value = data;
+    document.getElementById('edit_forma').value = forma;
+    document.getElementById('edit_valor').value = valor;
+    document.getElementById('edit_taxa').value = taxa;
+    new bootstrap.Modal(document.getElementById('modalEditPagamento')).show();
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     const dateInputs = document.querySelectorAll('input[name="data_recebimento"]');
     const today = new Date().toISOString().split('T')[0];

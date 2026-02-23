@@ -137,10 +137,45 @@ def adicionar_pagamento(pedido_id: int):
         observacoes=obs,
     )
     db.session.add(pag)
+    db.session.flush()
     atualizar_status_pagamento(pedido)
     db.session.commit()
     flash(f"Pagamento de R$ {valor:.2f} registrado. Status: {pedido.status_pagamento}", "success")
     return redirect(url_for("pedidos.detalhe", pedido_id=pedido_id))
+
+
+@bp.route("/pagamento/<int:pagamento_id>/editar", methods=["POST"])
+@login_required
+def editar_pagamento(pagamento_id: int):
+    pag = db.session.get(Pagamento, pagamento_id)
+    if not pag:
+        abort(404)
+    pedido = pag.pedido
+    
+    pag.data_recebimento = date.fromisoformat(request.form.get("data_recebimento"))
+    pag.forma_pagamento = request.form.get("forma_pagamento")
+    pag.valor_recebido = float(request.form.get("valor_recebido", 0) or 0)
+    pag.taxa_cartao = float(request.form.get("taxa_cartao", 0) or 0)
+    pag.observacoes = request.form.get("observacoes", "")
+    
+    atualizar_status_pagamento(pedido)
+    db.session.commit()
+    flash("Pagamento atualizado.", "success")
+    return redirect(url_for("pedidos.detalhe", pedido_id=pedido.id))
+
+
+@bp.route("/pagamento/<int:pagamento_id>/deletar", methods=["POST"])
+@login_required
+def deletar_pagamento(pagamento_id: int):
+    pag = db.session.get(Pagamento, pagamento_id)
+    if not pag:
+        abort(404)
+    pedido = pag.pedido
+    db.session.delete(pag)
+    atualizar_status_pagamento(pedido)
+    db.session.commit()
+    flash("Pagamento removido.", "success")
+    return redirect(url_for("pedidos.detalhe", pedido_id=pedido.id))
 
 
 @bp.route("/<int:pedido_id>/deletar", methods=["POST"])
