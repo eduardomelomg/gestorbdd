@@ -45,8 +45,12 @@ class Insumo(db.Model):
 
     @property
     def estoque_minimo_valor_base(self) -> Decimal:
-        """Calculates minimum stock requirement in base unit (g, ml, un)."""
-        if self.peso_por_embalagem:
+        """
+        Calculates minimum stock requirement in base unit.
+        - For 'g' and 'ml', the minimum is specified in 'packs' (e.g. 2 means 2 packs).
+        - For 'un', the minimum is specified in 'units' (e.g. 12 means 12 eggs).
+        """
+        if self.unidade in ['g', 'ml']:
             return Decimal(str(self.estoque_minimo)) * Decimal(str(self.peso_por_embalagem))
         return Decimal(str(self.estoque_minimo))
 
