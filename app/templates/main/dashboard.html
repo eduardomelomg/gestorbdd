@@ -99,7 +99,7 @@
           {% for i in alertas %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>{{ i.nome }}</span>
-            <span class="badge bg-danger">{{ i.estoque_atual }} {{ i.unidade }}</span>
+            <span class="badge bg-danger">{{ i.estoque_atual | qty_smart(i.unidade) }}</span>
           </li>
           {% endfor %}
         </ul>
