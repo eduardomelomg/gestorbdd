@@ -11,6 +11,16 @@ def register_filters(app: Flask) -> None:
         except (TypeError, ValueError):
             return "R$ 0,00"
 
+    @app.template_filter("qty")
+    def qty(value) -> str:
+        """Format a quantity with up to 2 decimal places."""
+        try:
+            v = float(value)
+            # Use localized decimal separator if needed, but for now just 2 decimals
+            return f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except (TypeError, ValueError):
+            return "0,00"
+
     @app.template_filter("status_badge")
     def status_badge(status: str) -> str:
         classes = {

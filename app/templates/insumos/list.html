@@ -15,8 +15,8 @@
         <td>{{ i.nome }} {% if i.estoque_baixo %}<span class="badge bg-danger">BAIXO</span>{% endif %}</td>
         <td>{{ i.unidade }}</td>
         <td>{{ i.custo_unitario | brl }}</td>
-        <td>{{ i.estoque_atual }} {{ i.unidade }}</td>
-        <td>{{ i.estoque_minimo }} {{ i.unidade }}</td>
+        <td>{{ i.estoque_atual | qty }} {{ i.unidade }}</td>
+        <td>{{ i.estoque_minimo | qty }} {{ i.unidade }}</td>
         <td class="d-flex gap-1 justify-content-end">
           <a href="{{ url_for('insumos.editar', insumo_id=i.id) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
           {% if current_user.is_admin %}
