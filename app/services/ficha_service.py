@@ -14,4 +14,9 @@ def resumo_ficha(ficha: FichaTecnica) -> dict:
         "lucro_unitario_atual": ficha.lucro_unitario_atual,
         "margem_atual_percentual": ficha.margem_atual_percentual,
         "markup_atual": ficha.markup_atual,
+        # Wholesale Simulation
+        "preco_venda_atacado": ficha.produto.preco_atacado if ficha.produto else Decimal("0"),
+        "lucro_unitario_atacado": ficha.lucro_unitario_atacado,
+        "margem_atacado_percentual": ficha.margem_atacado_percentual,
+        "markup_atacado": ficha.markup_atacado,
     }

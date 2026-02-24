@@ -66,6 +66,25 @@ class FichaTecnica(db.Model):
             return Decimal(str(self.produto.preco_varejo)) / self.custo_unitario
         return Decimal("0")
 
+    # Wholesale Simulation
+    @property
+    def lucro_unitario_atacado(self) -> Decimal:
+        if self.produto and self.produto.preco_atacado:
+            return Decimal(str(self.produto.preco_atacado)) - self.custo_unitario
+        return Decimal("0")
+
+    @property
+    def margem_atacado_percentual(self) -> Decimal:
+        if self.produto and self.produto.preco_atacado and self.produto.preco_atacado > 0:
+            return (self.lucro_unitario_atacado / Decimal(str(self.produto.preco_atacado))) * 100
+        return Decimal("0")
+
+    @property
+    def markup_atacado(self) -> Decimal:
+        if self.custo_unitario > 0 and self.produto and self.produto.preco_atacado:
+            return Decimal(str(self.produto.preco_atacado)) / self.custo_unitario
+        return Decimal("0")
+
     def __repr__(self) -> str:
         return f"<FichaTecnica produto_id={self.produto_id}>"
 
