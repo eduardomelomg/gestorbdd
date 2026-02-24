@@ -44,6 +44,28 @@ class FichaTecnica(db.Model):
             return Decimal("0")
         return self.custo_unitario / (1 - margem)
 
+    @property
+    def lucro_unitario_atual(self) -> Decimal:
+        """Profit per unit based on the current product price."""
+        if self.produto and self.produto.preco_varejo:
+            return Decimal(str(self.produto.preco_varejo)) - self.custo_unitario
+        return Decimal("0")
+
+    @property
+    def margem_atual_percentual(self) -> Decimal:
+        """Actual margin percentage based on the product's current retail price."""
+        if self.produto and self.produto.preco_varejo and self.produto.preco_varejo > 0:
+            lucro = self.lucro_unitario_atual
+            return (lucro / Decimal(str(self.produto.preco_varejo))) * 100
+        return Decimal("0")
+
+    @property
+    def markup_atual(self) -> Decimal:
+        """Markup factor (Price / Cost)."""
+        if self.custo_unitario > 0 and self.produto and self.produto.preco_varejo:
+            return Decimal(str(self.produto.preco_varejo)) / self.custo_unitario
+        return Decimal("0")
+
     def __repr__(self) -> str:
         return f"<FichaTecnica produto_id={self.produto_id}>"
 

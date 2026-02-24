@@ -27,16 +27,64 @@
       </div>
     </div>
 
-    <!-- Resultado -->
-    <div class="card shadow-sm border-success">
-      <div class="card-header fw-bold text-success">Resultado Calculado</div>
-      <div class="card-body small">
-        <table class="table table-sm mb-0">
-          <tr><td>Custo insumos</td><td class="text-end">{{ resumo.custo_total_insumos | brl }}</td></tr>
-          <tr><td>Custo total receita (c/ perdas)</td><td class="text-end">{{ resumo.custo_total_receita | brl }}</td></tr>
-          <tr class="fw-bold"><td>Custo unitário</td><td class="text-end">{{ resumo.custo_unitario | brl }}</td></tr>
-          <tr class="table-success"><td>Preço sugerido</td><td class="text-end">{{ resumo.preco_sugerido | brl }}</td></tr>
-        </table>
+    <!-- Resultado / Simulador -->
+    <div class="card shadow-sm border-success mb-3">
+      <div class="card-header bg-success text-white fw-bold d-flex justify-content-between">
+        Inteligência de Preço
+        <span class="badge bg-light text-success">Simulador</span>
+      </div>
+      <div class="card-body">
+        <!-- Parte 1: Custos -->
+        <h6 class="fw-bold border-bottom pb-1 small text-muted">Estrutura de Custos</h6>
+        <div class="d-flex justify-content-between mb-1 small">
+          <span>Insumos/Emb.</span>
+          <span>{{ resumo.custo_total_insumos | brl }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1 small text-danger">
+          <span>Perdas ({{ ficha.perdas_percentual | qty }}%)</span>
+          <span>+ {{ (resumo.custo_total_receita - resumo.custo_total_insumos - ficha.mao_de_obra_total) | brl }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2 small text-primary">
+          <span>Mão de Obra</span>
+          <span>+ {{ ficha.mao_de_obra_total | brl }}</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold border-top pt-1 text-dark">
+          <span>Custo Unitário</span>
+          <span>{{ resumo.custo_unitario | brl }}</span>
+        </div>
+
+        <!-- Parte 2: Sugestão vs Atual -->
+        <h6 class="fw-bold border-bottom pb-1 mt-3 small text-muted">Simulação de Venda</h6>
+        <div class="row g-2 mt-1">
+          <div class="col-6">
+            <div class="p-2 border rounded bg-light">
+              <div class="text-muted" style="font-size: 0.7rem;">Sugerido ({{ ficha.margem_desejada_percentual | qty }}% margem)</div>
+              <div class="fw-bold text-success">{{ resumo.preco_sugerido | brl }}</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 border rounded bg-primary-subtle border-primary">
+              <div class="text-primary text-uppercase fw-bold" style="font-size: 0.6rem;">Preço no Cadastro</div>
+              <div class="fw-bold text-primary">{{ resumo.preco_venda_atual | brl }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parte 3: Indicadores Reais -->
+        <div class="mt-3 p-2 bg-dark text-white rounded shadow-inner">
+          <div class="d-flex justify-content-between small opacity-75">
+            <span>Lucro Líquido Real</span>
+            <span class="fw-bold text-success">+ {{ resumo.lucro_unitario_atual | brl }}</span>
+          </div>
+          <div class="d-flex justify-content-between small mb-1 opacity-75">
+            <span>Margem Real (B2C)</span>
+            <span class="fw-bold {{ 'text-success' if resumo.margem_atual_percentual >= 50 else 'text-warning' }}">{{ resumo.margem_atual_percentual | qty }}%</span>
+          </div>
+          <div class="d-flex justify-content-between small border-top border-secondary pt-1 mt-1">
+            <span>Fator de Markup</span>
+            <span class="badge bg-warning text-dark">{{ resumo.markup_atual | qty }}x</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
