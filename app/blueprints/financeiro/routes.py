@@ -28,8 +28,8 @@ def index():
     despesas = db.session.execute(
         select(Despesa).where(
             Despesa.data >= date(ano, mes, 1),
-            Despesa.data <= date(ano, mes, 28) if mes == 2 else
-            date(ano, mes, 30) if mes in [4, 6, 9, 11] else date(ano, mes, 31),
+            Despesa.data <= (date(ano, mes, 28) if mes == 2 else
+                             date(ano, mes, 30) if mes in [4, 6, 9, 11] else date(ano, mes, 31)),
         ).order_by(Despesa.data.desc())
     ).scalars().all()
 
